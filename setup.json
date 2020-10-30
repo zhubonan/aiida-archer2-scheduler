@@ -18,9 +18,7 @@
     "Topic :: Scientific/Engineering"
   ],
   "install_requires": [
-    "aiida_core >= 1.0.0, <2.0.0",
-    "gssapi~=1.6",
-    "pyasn1~=0.4.8"
+    "aiida_core >= 1.0.0, <2.0.0"
   ],
   "extras_require": {
     "precommit": [

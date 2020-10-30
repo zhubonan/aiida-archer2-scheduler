@@ -116,8 +116,8 @@ class Archer2SSHClient(SSHClient):
                     saved_exception = e
 
         # Try default ssh key in ~/.ssh 
+        keyfiles = []
         for keytype, name in [
-            (RSAKey, "rsa"),
             (DSSKey, "dsa"),
             (ECDSAKey, "ecdsa"),
             (Ed25519Key, "ed25519"),
