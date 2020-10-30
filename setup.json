@@ -1,0 +1,42 @@
+{
+  "name": "aiida-archer2-scheduler",
+  "version": "1.0.0",
+  "url": "https://github.com/pzarabadip/aiida-archer2-scheduler",
+  "license": "MIT License",
+  "author": "Bonan Zhu",
+  "author_email": "zhubonan@outlook.com",
+  "include_package_data": true,
+  "python_requires": ">=3.6",
+  "classifiers": [
+    "Framework :: AiiDA",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Scientific/Engineering"
+  ],
+  "install_requires": [
+    "aiida_core >= 1.0.0, <2.0.0",
+    "gssapi~=1.6",
+    "pyasn1~=0.4.8"
+  ],
+  "extras_require": {
+    "precommit": [
+      "pre-commit==2.0.1",
+      "prospector==1.2.0",
+      "pylint==2.4.4",
+      "yapf==0.28.0"
+    ]
+  },
+  "reentry_register": true,
+  "entry_points": {
+    "aiida.cmdline.computer.configure": [
+      "ssharcher2 = aiida_archer2_scheduler.archer2.ssh_archer2:CONFIGURE_SSH_CMD"
+    ],
+    "aiida.transports": [
+      "ssharcher2 = aiida_archer2_scheduler.archer2.ssh_archer2:SshTransport"
+    ]
+  }
+}
