@@ -17,6 +17,12 @@ Once all files are in place and entry points are defined accordingly:
 pip install -e .
 ```
 
+# Changelog
+
+## 1.1.0
+
+Added specialised scheduler for ARCHER2
+
 # Contribution
 You may kindly open and PR and add your collection to the package so it can contain all possible combinations and plugins to be used by others as well.
 
