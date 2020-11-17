@@ -37,7 +37,7 @@
       "ssharcher2 = aiida_archer2_scheduler.archer2.ssh_archer2:SshTransport"
     ],
     "aiida.schedulers": [
-      "slrumarcher2 = aiida_archer2_scheduler.archer2.slurm_archer2:Archer2SlurmScheduler"
+      "slurmarcher2 = aiida_archer2_scheduler.archer2.slurm_archer2:Archer2SlurmScheduler"
     ]
   }
 }

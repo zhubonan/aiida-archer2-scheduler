@@ -66,7 +66,7 @@ class FelxibleNodeNumber(NodeNumberJobResource):
         # Here is there difference from the original SLURM scheduler - we allow under ultilisation
         # Eg. request 256 tasks, each take 2 cpus but only use 239 tasks becuase the program prefer certain
         # multiple
-        if resources.tot_num_mpiprocs >= resources.num_mpiprocs_per_machine * resources.num_machines:
+        if resources.tot_num_mpiprocs > resources.num_mpiprocs_per_machine * resources.num_machines:
             raise ValueError('`tot_num_mpiprocs` is larger than `num_mpiprocs_per_machine * num_machines`.')
 
         is_greater_equal_one('num_mpiprocs_per_machine')
