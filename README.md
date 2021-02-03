@@ -17,7 +17,21 @@ Once all files are in place and entry points are defined accordingly:
 pip install -e .
 ```
 
+# Using the plugin
+
+Use `verdi computer setup` to setup a ARCHER2 computer node.
+Choose the `ssharcher2` pulgin for transport and `slurmarcher` for scheuler.
+
+Once done, use the `verdi computer configure ssharcher2 <name>` to configure the transport for the computer.
+
+The login password should be set under the `ARCHER2_PASS` enviromental variable, or `ARCHER2_PASS_<USERNAME>` for per-user basis if desired.
+
 # Changelog
+
+## 1.2.0
+
+Allow per-user based password settings. 
+The password should be put into `ARCHER2_PASS_<USERNAME>` where `<USERNAME>` is your username in upper case.
 
 ## 1.1.0
 
