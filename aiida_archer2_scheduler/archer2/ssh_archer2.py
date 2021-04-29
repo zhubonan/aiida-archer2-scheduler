@@ -562,13 +562,15 @@ class SshTransport(Transport):  # pylint: disable=too-many-public-methods
         # Additional password is needed for ARCHER
         if 'archer2' in self._machine:
             username = self._connect_args['username'].upper()
-            password = os.environ.get('ARCHER2_PASS_' + username)
+            env_name = 'ARCHER2_PASS_' + username
+            password = os.environ.get(env_name)
             
             if not password:
+                # Fallback for generic ones
                 password = os.environ.get('ARCHER2_PASS')
 
             if not password:
-                raise ValueError('Cannot found password for ARCHER2 - please set the ARCHER2_PASS environmental variable')
+                raise ValueError(f'Cannot found password for ARCHER2 - please set the {env_name} environmental variable')
             self._connect_args['password'] = password
 
     def open(self):
