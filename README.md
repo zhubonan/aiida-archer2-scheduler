@@ -32,6 +32,7 @@ The login password should be set under the `ARCHER2_PASS` enviromental variable,
 
 You password will be exposed in the environmental variable. However, they are only needed when launching daemon or accessing the files interactively.
 In the former case, once the daemon has started, one can safely unset the environmental variables.
+It is highly recommanded to use a random generated password specific for ARCHER2, and have it stored safetly with password managers such as KeePass.
 
 The following guide may be useful for automating this process:
 
