@@ -65,6 +65,24 @@ Then you can use `unset-pass` to remove them from the environmental variable.
 
 Note that the password needs to be set to use commands using transports, such as `verdi calcjob gotocomputer`.
 
+# Specifying resources
+
+
+```python
+Dict(dict={
+        'resources': {
+            'tot_num_mpiprocs': cores, # Total number of MPI processes
+            'num_machines': nm,  # Number of nodes to be used
+            'num_mpiprocs_per_machine': num_mpi_per_machine,  # Number of mpi processes per machine - useful if underpopulating is needed
+        },
+        'max_wallclock_seconds': int(3600 * hours),
+        'import_sys_environment': False,
+        'mpirun_extra_params': ["--distribution=block:block", "--hint=nomultithread"],
+        'account': '<budget_code>',
+        'queue_name': '<partition_name>',
+    }
+```
+
 # Changelog
 
 ## 2.0.0

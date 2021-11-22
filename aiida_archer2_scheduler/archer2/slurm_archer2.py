@@ -120,3 +120,15 @@ class Archer2SlurmScheduler(SlurmScheduler):
     Use more flexible job resources to allow underpopulating nodes
     """
     _job_resource_class = Archer2SlurmJobResource
+    DEFAULT_ARCHER2_QOS="standard"
+    DEFAULT_ARCHER2_PARTITION="standard"
+
+    def _get_submit_script_header(self, job_tmpl):
+        """"""
+        # Apply some default settings for ARCHER2 - so one does not need to pass them everytime....
+        if not job_tmpl.qos:
+            job_tmpl.qos = self.DEFAULT_ARCHER2_QOS
+        if not job_tmpl.queue_name:
+            job_tmpl.queue_name = self.DEFAULT_ARCHER2_PARTITION
+
+        return super()._get_submit_script_header(job_tmpl)
