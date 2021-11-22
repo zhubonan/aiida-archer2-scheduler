@@ -1,3 +1,7 @@
 {
-    "python.pythonPath": "/home/bonan/miniconda3/envs/aiida-1.0-dev/bin/python"
+    "python.pythonPath": "/home/bonan/miniconda3/envs/aiida-1.0-dev/bin/python",
+    "cSpell.enabled": true,
+    "cSpell.enableFiletypes": [
+        "markdown"
+    ]
 }

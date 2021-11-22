@@ -20,13 +20,23 @@ pip install -e .
 # Using the plugin
 
 Use `verdi computer setup` to setup a ARCHER2 computer node.
-Choose the `ssharcher2` pulgin for transport and `slurmarcher` for scheuler.
+Choose the `archer.ssh` plugin for transport and `archer2.slurm` for scheduler.
 
 Once done, use the `verdi computer configure ssharcher2 <name>` to configure the transport for the computer.
 
 The login password should be set under the `ARCHER2_PASS` enviromental variable, or `ARCHER2_PASS_<USERNAME>` for per-user basis if desired.
 
+> Caustion ❗ - use at your own risk
+
+>> You password will be exposed in the environmental variable. However, they are only needed when launching daemon or accessing the files interactively.
+>> In the former case, once the daemon has started, one can safely unset the environmental variables.
+
 # Changelog
+
+## 2.0.0
+
+- Updated the authentication order to support the ARCHER2 full system. 
+- Updated entrypoint name prefixes to comply with the new aiida-core convention. Old entrypoint names remain for now to ensure backward compatibility.   
 
 ## 1.2.0
 
