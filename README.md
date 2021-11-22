@@ -9,10 +9,11 @@ Compatible with:
 Custom [AiiDA](www.aiida.net) scheduler/transport plugins for ARCHER2.
 
 # How does it work?
-It can be used to add custom plugins under the `aiida-scheduler` entry point. So, once you have it installed, you will have extra scheduler plugins in addition to ones shipped with AiiDA. Once you need to configure the computer, you simply provide the entry point for the custom scheduler plugin.
+It can be used to add custom plugins under the `aiida-scheduler` entry point. So, once you have it installed, you will have extra scheduler and transport plugins in addition to ones shipped with AiiDA. When you need to configure the computer, you simply provide the entry point that is compatible with the target machine.
 
 # Installation
 Once all files are in place and entry points are defined accordingly:
+
 ```console
 pip install -e .
 ```
@@ -20,16 +21,48 @@ pip install -e .
 # Using the plugin
 
 Use `verdi computer setup` to setup a ARCHER2 computer node.
-Choose the `archer.ssh` plugin for transport and `archer2.slurm` for scheduler.
+Choose the `archer2.ssh` plugin for transport and `archer2.slurm` for scheduler.
 
-Once done, use the `verdi computer configure ssharcher2 <name>` to configure the transport for the computer.
+Once done, use the `verdi computer configure archer2.ssh <name>` to configure the transport for the computer.
 
 The login password should be set under the `ARCHER2_PASS` enviromental variable, or `ARCHER2_PASS_<USERNAME>` for per-user basis if desired.
 
-> Caustion ❗ - use at your own risk
 
->> You password will be exposed in the environmental variable. However, they are only needed when launching daemon or accessing the files interactively.
->> In the former case, once the daemon has started, one can safely unset the environmental variables.
+# Security concerns ❗
+
+You password will be exposed in the environmental variable. However, they are only needed when launching daemon or accessing the files interactively.
+In the former case, once the daemon has started, one can safely unset the environmental variables.
+
+The following guide may be useful for automating this process:
+
+
+First, Make a file called archer-pass in ~/.config, containing the following line:
+
+```bash
+export ARCHER2_PASS_<USERNAME>=<your_password>
+```
+
+Then run `gpg -c archer-pass`, which will prompt you for a password used for encrypting this file. Afterwards, there will be a `archer-pass.gpg` in the same folder file. 
+You can delete the original file now.
+
+Next, add the following function to your `.bashrc`:
+
+```bash
+archer-pass () {
+        eval `gpg -d ~/.config/archer-pass.gpg 2>/dev/null`
+}
+
+unset-pass () {
+        unset $(env | grep ARCHER2_PASS | awk -F'=' '{print $1}')
+}
+
+```
+
+After restarting the terminal, you can use the `archer-pass` function in the shell to add the environmental variables: `ARCHER2_PASS_<USERNAME>`. 
+It will ask you to enter the password used for encryption. Once the environmental variable are in place, start/restart the AiiDA daemon so they get picked up. 
+Then you can use `unset-pass` to remove them from the environmental variable.
+
+Note that the password needs to be set to use commands using transports, such as `verdi calcjob gotocomputer`.
 
 # Changelog
 
