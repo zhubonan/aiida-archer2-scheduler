@@ -76,15 +76,6 @@ class Archer2SSHClient(SSHClient):
         if passphrase is None and password is not None:
             passphrase = password
 
-        # Password authentication goes first
-        try:
-            allowed_types = set( self._transport.auth_password(username, password))
-        except SSHException as e:
-            saved_exception = e
-
-        # If allowed_types is empty the authentication worked
-        if not allowed_types:
-            return 
 
         if pkey is not None:
             try:
@@ -167,9 +158,21 @@ class Archer2SSHClient(SSHClient):
             except SSHException as e:
                 saved_exception = e
 
-        # if we got an auth-failed exception earlier, re-raise it
+        # Password authentication goes last
+        try:
+            allowed_types = set( self._transport.auth_password(username, password))
+        except SSHException as e:
+            saved_exception = e
+
+        # If allowed_types is empty the authentication worked
+        if not allowed_types:
+            return 
+
+         # if we got an auth-failed exception earlier, re-raise it
         if saved_exception is not None:
             raise saved_exception
+
+       
         raise SSHException("No authentication methods available")
 
 
