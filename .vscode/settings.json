@@ -3,5 +3,10 @@
     "cSpell.enabled": true,
     "cSpell.enableFiletypes": [
         "markdown"
+    ],
+    "cSpell.words": [
+        "gotocomputer",
+        "nomultithread",
+        "underpopulating"
     ]
 }
