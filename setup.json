@@ -32,10 +32,12 @@
   "entry_points": {
     "aiida.cmdline.computer.configure": [
       "ssharcher2 = aiida_archer2_scheduler.archer2.ssh_archer2:CONFIGURE_SSH_CMD",
-      "archer2.ssh = aiida_archer2_scheduler.archer2.ssh_archer2:CONFIGURE_SSH_CMD"
+      "archer2.ssh = aiida_archer2_scheduler.archer2.ssh_archer2:CONFIGURE_SSH_CMD",
+      "archer2_4c.ssh = aiida_archer2_scheduler.archer2.ssh_archer2:CONFIGURE_SSH_CMD"
     ],
     "aiida.transports": [
       "ssharcher2 = aiida_archer2_scheduler.archer2.ssh_archer2:SshTransport",
+      "archer2_4c.ssh = aiida_archer2_scheduler.archer2.ssh_archer2:SshTransport4C",
       "archer2.ssh = aiida_archer2_scheduler.archer2.ssh_archer2:SshTransport"
     ],
     "aiida.schedulers": [

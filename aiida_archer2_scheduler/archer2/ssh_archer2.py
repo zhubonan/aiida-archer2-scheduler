@@ -40,7 +40,7 @@ from aiida.cmdline.params import options
 from aiida.cmdline.params.types.path import AbsolutePathOrEmptyParamType
 from aiida.common.escaping import escape_for_bash
 from aiida.transports.transport import Transport, TransportInternalError
-__all__ = ('parse_sshconfig', 'convert_to_bool', 'SshTransport')
+__all__ = ('parse_sshconfig', 'convert_to_bool', 'SshTransport', 'SSHTransport4C')
 
 
 class Archer2SSHClient(SSHClient):
@@ -175,6 +175,134 @@ class Archer2SSHClient(SSHClient):
        
         raise SSHException("No authentication methods available")
 
+class ARCHER24CSSHClient(SSHClient):
+    """Client for the 4-cabinet service"""
+    
+    def _auth(
+        self,
+        username,
+        password,
+        pkey,
+        key_filenames,
+        allow_agent,
+        look_for_keys,
+        gss_auth,
+        gss_kex,
+        gss_deleg_creds,
+        gss_host,
+        passphrase,
+    ):
+        """
+        Try, in order:
+
+            - Plain username/password auth, if a password was given.
+            - A series of trials using public keys 
+
+        """
+        saved_exception = None
+        allowed_types = set()
+        if passphrase is None and password is not None:
+            passphrase = password
+
+        # Password authentication goes first
+        try:
+            allowed_types = set( self._transport.auth_password(username, password))
+        except SSHException as e:
+            saved_exception = e
+
+        if pkey is not None:
+            try:
+                self._log(
+                    DEBUG,
+                    "Trying SSH key {}".format(
+                        hexlify(pkey.get_fingerprint())
+                    ),
+                )
+                allowed_types = self._transport.auth_publickey(username, pkey)
+                if not allowed_types:
+                    return
+            except SSHException as e:
+                saved_exception = e
+
+
+        # Using supplied file path
+        for key_filename in key_filenames:
+            for pkey_class in (RSAKey, DSSKey, ECDSAKey, Ed25519Key):
+                try:
+                    key = self._key_from_filepath(
+                        key_filename, pkey_class, passphrase
+                    )
+                    allowed_types = self._transport.auth_publickey(username, key)
+                    if not allowed_types:
+                        return
+                    break
+                except SSHException as e:
+                    saved_exception = e
+
+        # Try default ssh key in ~/.ssh 
+        keyfiles = []
+        for keytype, name in [
+            (DSSKey, "dsa"),
+            (ECDSAKey, "ecdsa"),
+            (Ed25519Key, "ed25519"),
+        ]:
+            # ~/ssh/ is for windows
+            for directory in [".ssh", "ssh"]:
+                full_path = os.path.expanduser(
+                    "~/{}/id_{}".format(directory, name)
+                )
+                if os.path.isfile(full_path):
+                    # TODO: only do this append if below did not run
+                    keyfiles.append((keytype, full_path))
+                    if os.path.isfile(full_path + "-cert.pub"):
+                        keyfiles.append((keytype, full_path + "-cert.pub"))
+
+            if not look_for_keys:
+                keyfiles = []
+
+            for pkey_class, filename in keyfiles:
+                try:
+                    key = self._key_from_filepath(
+                        filename, pkey_class, passphrase
+                    )
+                    # for 2-factor auth a successfully auth'd key will result
+                    # in ['password']
+                    allowed_types = self._transport.auth_publickey(username, key)
+                    if not allowed_types:
+                        return
+                    break
+                except (SSHException, IOError) as e:
+                    saved_exception = e
+
+        # Try using agents
+        if self._agent is None:
+            self._agent = Agent()
+
+        for key in self._agent.get_keys():
+            try:
+                id_ = hexlify(key.get_fingerprint())
+                self._log(DEBUG, "Trying SSH agent key {}".format(id_))
+                # for 2-factor auth a successfully auth'd key password
+                # will return an allowed 2fac auth method
+                allowed_types = self._transport.auth_publickey(username, key)
+                if not allowed_types:
+                    return
+                break
+            except SSHException as e:
+                saved_exception = e
+
+        # If allowed_types is empty the authentication worked
+        if not allowed_types:
+            return 
+
+         # if we got an auth-failed exception earlier, re-raise it
+        if saved_exception is not None:
+            raise saved_exception
+
+       
+        raise SSHException("No authentication methods available")
+
+
 
 
 def parse_sshconfig(computername):
@@ -220,6 +348,7 @@ class SshTransport(Transport):  # pylint: disable=too-many-public-methods
     # Valid keywords accepted by the connect method of paramiko.SSHClient
     # I disable 'password' and 'pkey' to avoid these data to get logged in the
     # aiida log file.
+    CLIENT_CLASS = Archer2SSHClient
     _valid_connect_options = [
         (
             'username', {
@@ -537,7 +666,7 @@ class SshTransport(Transport):  # pylint: disable=too-many-public-methods
 
         self._machine = kwargs.pop('machine')
 
-        self._client = Archer2SSHClient()
+        self._client = self.CLIENT_CLASS() 
         self._load_system_host_keys = kwargs.pop('load_system_host_keys', False)
         if self._load_system_host_keys:
             self._client.load_system_host_keys()
@@ -1572,3 +1701,10 @@ class SshTransport(Transport):  # pylint: disable=too-many-public-methods
             raise
         else:
             return True
+
+
+class SshTransport4C(SshTransport):
+    """
+    SSH Transport for the 4 cabinet service
+    """
+    CLIENT_CLASS = ARCHER24CSSHClient
