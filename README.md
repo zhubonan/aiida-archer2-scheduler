@@ -18,6 +18,10 @@ Once all files are in place and entry points are defined accordingly:
 pip install -e .
 ```
 
+# AiiDA compatibility
+
+The 2.x versions of this package are compatible with aiida-core 1.x, and the 3.x versions are compatible with aiida-core 2.x.
+
 # Using the plugin
 
 Use `verdi computer setup` to setup a ARCHER2 computer node.

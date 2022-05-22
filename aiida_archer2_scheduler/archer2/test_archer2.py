@@ -61,7 +61,8 @@ def test_submit_script():
     Test the creation of a simple submission script.
     """
     from aiida.schedulers.datastructures import JobTemplate
-    from aiida.common.datastructures import CodeInfo, CodeRunMode
+    from aiida.common.datastructures import CodeRunMode
+    from aiida.schedulers.datastructures import JobTemplateCodeInfo
 
     scheduler = Archer2SlurmScheduler()
 
@@ -70,7 +71,7 @@ def test_submit_script():
     job_tmpl.uuid = str(uuid.uuid4())
     job_tmpl.job_resource = scheduler.create_job_resource(num_machines=1, num_mpiprocs_per_machine=1)
     job_tmpl.max_wallclock_seconds = 24 * 3600
-    code_info = CodeInfo()
+    code_info = JobTemplateCodeInfo()
     code_info.cmdline_params = ['mpirun', '-np', '23', 'pw.x', '-npool', '1']
     code_info.stdin_name = 'aiida.in'
     job_tmpl.codes_info = [code_info]
